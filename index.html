@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vanyla AI | Powered by Joyy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        /* --- AUTO THEME SYSTEM --- */
+        :root {
+            /* Light Theme (Default) */
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --primary: #dc143c; /* Crimson */
+            --primary-glow: rgba(220, 20, 60, 0.15);
+            --text: #1a1a1a;
+            --text-dim: #666666;
+            --border: #e0e0e0;
+            --inner-bg: #f1f1f1;
+            --btn-nav-bg: #e8e8e8;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                /* Dark Theme Overrides */
+                --bg: #050505;
+                --card-bg: #111111;
+                --primary-glow: rgba(220, 20, 60, 0.4);
+                --text: #ffffff;
+                --text-dim: #a0a0a0;
+                --border: #222222;
+                --inner-bg: #000000;
+                --btn-nav-bg: #1a1a1a;
+            }
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            transition: background-color 0.5s ease;
+        }
+
+        /* Ambient Glow */
+        body::before {
+            content: '';
+            position: fixed;
+            width: 60vw;
+            height: 60vw;
+            background: var(--primary);
+            filter: blur(160px);
+            opacity: 0.1;
+            top: -10%;
+            right: -10%;
+            z-index: -1;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            animation: fadeIn 0.7s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        header { text-align: center; margin-bottom: 25px; }
+        header h1 { font-size: clamp(1.8rem, 6vw, 2.4rem); font-weight: 800; letter-spacing: -1px; }
+        .highlight { color: var(--primary); text-shadow: 0 0 15px var(--primary-glow); }
+        header p { color: var(--text-dim); font-size: 0.9rem; margin-top: 5px; font-weight: 500; }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            padding: clamp(24px, 6vw, 35px);
+            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(8px);
+            transition: var(--transition);
+        }
+
+        .upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 20px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            background: rgba(127, 127, 127, 0.03);
+            margin-bottom: 25px;
+        }
+
+        .upload-area:hover { border-color: var(--primary); background: rgba(220, 20, 60, 0.05); }
+        .icon-box { font-size: 45px; display: block; margin-bottom: 12px; filter: grayscale(0.2); }
+        #file-name { font-size: 0.85rem; color: var(--text-dim); overflow-wrap: break-word; }
+
+        .controls-section { margin-bottom: 30px; }
+        .label-group { display: flex; justify-content: space-between; margin-bottom: 12px; padding: 0 5px; }
+        .label-group span { font-size: 0.7rem; letter-spacing: 1.5px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; }
+
+        .selector-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--inner-bg);
+            padding: 6px;
+            border-radius: 100px;
+            border: 1px solid var(--border);
+        }
+
+        .nav-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: none;
+            background: var(--btn-nav-bg);
+            color: var(--text);
+            font-size: 1.4rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .nav-btn:hover { background: var(--primary); color: white; box-shadow: 0 0 15px var(--primary-glow); }
+        .nav-btn:active { transform: scale(0.85); }
+        .scale-display { font-size: 1.1rem; font-weight: 700; color: var(--text); letter-spacing: 0.5px; }
+
+        .btn-enhance {
+            width: 100%;
+            padding: 18px;
+            border-radius: 16px;
+            border: none;
+            background: var(--primary);
+            color: white;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 10px 25px -5px var(--primary-glow);
+            transition: var(--transition);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-enhance:hover { transform: translateY(-3px); filter: brightness(1.1); box-shadow: 0 15px 30px -5px var(--primary-glow); }
+
+        #result-container { margin-top: 30px; display: none; animation: fadeIn 0.5s ease; }
+        .result-preview { width: 100%; border-radius: 18px; border: 1px solid var(--border); margin-bottom: 15px; }
+
+        footer { text-align: center; margin-top: 40px; font-size: 0.75rem; color: var(--text-dim); letter-spacing: 1px; }
+        footer .joyy { font-weight: 800; color: var(--primary); }
+
+        @media (max-width: 380px) {
+            .card { padding: 20px; }
+            .nav-btn { width: 42px; height: 42px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>VANYLA <span class="highlight">AI</span></h1>
+            <p>Smart Auto-Adaptive Enhancer</p>
+        </header>
+
+        <main class="card">
+            <div class="upload-area" onclick="document.getElementById('file-input').click()">
+                <span class="icon-box">🖼️</span>
+                <p id="file-name">Pilih atau seret gambar ke sini</p>
+                <input type="file" id="file-input" accept="image/*" hidden>
+            </div>
+
+            <div class="controls-section">
+                <div class="label-group">
+                    <span>AI Intensity</span>
+                    <span id="scale-val-label">15x</span>
+                </div>
+                <div class="selector-container">
+                    <button class="nav-btn" onclick="adjustScale(-1)">−</button>
+                    <div class="scale-display" id="scale-text">SCALE 15</div>
+                    <button class="nav-btn" onclick="adjustScale(1)">+</button>
+                </div>
+            </div>
+
+            <button class="btn-enhance" id="process-btn" onclick="handleEnhance()">
+                START ENHANCING
+            </button>
+
+            <div id="result-container">
+                <div class="label-group"><span>Hasil Akhir</span></div>
+                <img src="" id="output-img" class="result-preview">
+                <button class="btn-enhance" style="background: transparent; border: 2px solid var(--primary); color: var(--text); box-shadow: none;" onclick="window.open(document.getElementById('output-img').src)">
+                    BUKA FULL HD
+                </button>
+            </div>
+        </main>
+
+        <footer>
+            &copy; 2026 Developed by <span class="joyy">Joyy</span> &bull; Vanyla Hub
+        </footer>
+    </div>
+
+    <script>
+        let currentScale = 15;
+        function adjustScale(val) {
+            currentScale = Math.max(1, currentScale + val);
+            document.getElementById('scale-text').innerText = `SCALE ${currentScale}`;
+            document.getElementById('scale-val-label').innerText = `${currentScale}x`;
+        }
+
+        function handleEnhance() {
+            const btn = document.getElementById('process-btn');
+            btn.innerText = "PROCESSING...";
+            // Masukkan logic API Picsart di sini
+        }
+    </script>
+</body>
+</html>
