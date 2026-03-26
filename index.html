@@ -3,15 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Vanyla AI | Powered by Joyy</title>
+    <title>Vanyla AI | Joyy</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        /* --- AUTO THEME SYSTEM --- */
         :root {
-            /* Light Theme (Default) */
             --bg: #f8f9fa;
             --card-bg: #ffffff;
-            --primary: #dc143c; /* Crimson */
+            --primary: #dc143c;
             --primary-glow: rgba(220, 20, 60, 0.15);
             --text: #1a1a1a;
             --text-dim: #666666;
@@ -23,7 +21,6 @@
 
         @media (prefers-color-scheme: dark) {
             :root {
-                /* Dark Theme Overrides */
                 --bg: #050505;
                 --card-bg: #111111;
                 --primary-glow: rgba(220, 20, 60, 0.4);
@@ -49,7 +46,6 @@
             transition: background-color 0.5s ease;
         }
 
-        /* Ambient Glow */
         body::before {
             content: '';
             position: fixed;
@@ -101,7 +97,7 @@
         }
 
         .upload-area:hover { border-color: var(--primary); background: rgba(220, 20, 60, 0.05); }
-        .icon-box { font-size: 45px; display: block; margin-bottom: 12px; filter: grayscale(0.2); }
+        .icon-box { font-size: 45px; display: block; margin-bottom: 12px; }
         #file-name { font-size: 0.85rem; color: var(--text-dim); overflow-wrap: break-word; }
 
         .controls-section { margin-bottom: 30px; }
@@ -131,7 +127,6 @@
             align-items: center;
             justify-content: center;
             transition: var(--transition);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
 
         .nav-btn:hover { background: var(--primary); color: white; box-shadow: 0 0 15px var(--primary-glow); }
@@ -154,7 +149,8 @@
             letter-spacing: 1px;
         }
 
-        .btn-enhance:hover { transform: translateY(-3px); filter: brightness(1.1); box-shadow: 0 15px 30px -5px var(--primary-glow); }
+        .btn-enhance:hover { transform: translateY(-3px); filter: brightness(1.1); }
+        .btn-enhance:disabled { background: #555; cursor: not-allowed; transform: none; box-shadow: none; }
 
         #result-container { margin-top: 30px; display: none; animation: fadeIn 0.5s ease; }
         .result-preview { width: 100%; border-radius: 18px; border: 1px solid var(--border); margin-bottom: 15px; }
@@ -162,10 +158,18 @@
         footer { text-align: center; margin-top: 40px; font-size: 0.75rem; color: var(--text-dim); letter-spacing: 1px; }
         footer .joyy { font-weight: 800; color: var(--primary); }
 
-        @media (max-width: 380px) {
-            .card { padding: 20px; }
-            .nav-btn { width: 42px; height: 42px; }
+        .spinner {
+            display: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s linear infinite;
+            margin-right: 10px;
         }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -173,37 +177,40 @@
     <div class="container">
         <header>
             <h1>VANYLA <span class="highlight">AI</span></h1>
-            <p>Smart Auto-Adaptive Enhancer</p>
+            <p>Adaptive Image Upscaler</p>
         </header>
 
         <main class="card">
             <div class="upload-area" onclick="document.getElementById('file-input').click()">
                 <span class="icon-box">🖼️</span>
-                <p id="file-name">Pilih atau seret gambar ke sini</p>
+                <p id="file-name">Pilih foto untuk ditingkatkan</p>
                 <input type="file" id="file-input" accept="image/*" hidden>
             </div>
 
             <div class="controls-section">
                 <div class="label-group">
-                    <span>AI Intensity</span>
-                    <span id="scale-val-label">15x</span>
+                    <span>Target Power</span>
+                    <span id="scale-val-label">4x</span>
                 </div>
                 <div class="selector-container">
-                    <button class="nav-btn" onclick="adjustScale(-1)">−</button>
-                    <div class="scale-display" id="scale-text">SCALE 15</div>
-                    <button class="nav-btn" onclick="adjustScale(1)">+</button>
+                    <button class="nav-btn" onclick="adjustScale()">−</button>
+                    <div class="scale-display" id="scale-text">SCALE 4</div>
+                    <button class="nav-btn" onclick="adjustScale()">+</button>
                 </div>
             </div>
 
             <button class="btn-enhance" id="process-btn" onclick="handleEnhance()">
-                START ENHANCING
+                <div style="display: flex; align-items: center; justify-content: center;">
+                    <div class="spinner" id="loader"></div>
+                    <span id="btn-text">START PROCESSING</span>
+                </div>
             </button>
 
             <div id="result-container">
-                <div class="label-group"><span>Hasil Akhir</span></div>
+                <div class="label-group"><span>Hasil Selesai</span></div>
                 <img src="" id="output-img" class="result-preview">
                 <button class="btn-enhance" style="background: transparent; border: 2px solid var(--primary); color: var(--text); box-shadow: none;" onclick="window.open(document.getElementById('output-img').src)">
-                    BUKA FULL HD
+                    BUKA FULL SIZE
                 </button>
             </div>
         </main>
@@ -214,17 +221,62 @@
     </div>
 
     <script>
-        let currentScale = 15;
-        function adjustScale(val) {
-            currentScale = Math.max(1, currentScale + val);
-            document.getElementById('scale-text').innerText = `SCALE ${currentScale}`;
-            document.getElementById('scale-val-label').innerText = `${currentScale}x`;
+        let selectedFileBase64 = null;
+
+        document.getElementById('file-input').onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('file-name').innerText = file.name;
+                const reader = new FileReader();
+                reader.onload = (event) => { selectedFileBase64 = event.target.result; };
+                reader.readAsDataURL(file);
+            }
+        };
+
+        function adjustScale() {
+            alert("Skala 4x adalah konfigurasi optimal untuk sistem ini.");
         }
 
-        function handleEnhance() {
+        async function handleEnhance() {
+            if (!selectedFileBase64) return alert("Pilih gambar terlebih dahulu.");
+
             const btn = document.getElementById('process-btn');
-            btn.innerText = "PROCESSING...";
-            // Masukkan logic API Picsart di sini
+            const loader = document.getElementById('loader');
+            const btnText = document.getElementById('btn-text');
+            const resultContainer = document.getElementById('result-container');
+            const outputImg = document.getElementById('output-img');
+
+            btn.disabled = true;
+            loader.style.display = "block";
+            btnText.innerText = "PROCESSING...";
+            resultContainer.style.display = "none";
+
+            try {
+                const response = await fetch('/api/remini', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        image: selectedFileBase64,
+                        scale: '4'
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.result) {
+                    outputImg.src = data.result;
+                    resultContainer.style.display = "block";
+                    btnText.innerText = "SUCCESS";
+                } else {
+                    throw new Error(data.error || "Gagal memproses gambar.");
+                }
+            } catch (err) {
+                alert("Error: " + err.message);
+                btnText.innerText = "RETRY";
+            } finally {
+                btn.disabled = false;
+                loader.style.display = "none";
+            }
         }
     </script>
 </body>
